@@ -1,0 +1,18 @@
+---
+- hosts: all   # this must remain "all" because it is called from both the packer build and the makefile
+  sudo: yes
+  tasks:
+  - name: "cleaning task for yum"
+    command: /usr/bin/yum clean all  
+  - name: "Install extras as needed"
+    yum: name={{ item }} state=latest
+    with_items:
+      - epel-release
+      - libselinux-python
+      - docker-io
+      - python-pip
+  - name: "Copy script for final setup"
+    copy: src=files/setup.sh dest=/usr/local/bin/setup.sh owner=vagrant mode=755
+  - name: "Run setup script"
+    command: /usr/local/bin/setup.sh
+
